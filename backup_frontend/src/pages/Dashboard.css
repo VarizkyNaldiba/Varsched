@@ -1,0 +1,154 @@
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.page-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+}
+
+.stat-card {
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.stat-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-content h3 {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  font-family: var(--font-heading);
+}
+
+.dashboard-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+.chart-placeholder {
+  padding: 24px;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.chart-body {
+  height: 200px;
+  display: flex;
+  align-items: flex-end;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.bars {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  height: 100%;
+  align-items: flex-end;
+}
+
+.bar-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.bar {
+  width: 32px;
+  background: var(--primary-color);
+  border-radius: 4px 4px 0 0;
+  transition: var(--transition);
+}
+
+.bar:hover {
+  background: var(--primary-hover);
+  opacity: 0.8;
+}
+
+.bar-wrapper span {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.recent-activity {
+  padding: 24px;
+}
+
+.recent-activity h3 {
+  margin-bottom: 24px;
+}
+
+.habit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.habit-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.habit-name {
+  font-weight: 500;
+}
+
+.habit-days {
+  display: flex;
+  gap: 6px;
+}
+
+.habit-day {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background: var(--border-color);
+}
+
+.habit-day.done {
+  background: var(--success-color);
+}
+
+@media (max-width: 1024px) {
+  .dashboard-content {
+    grid-template-columns: 1fr;
+  }
+}

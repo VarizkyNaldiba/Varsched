@@ -1,0 +1,135 @@
+.pomodoro-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: center;
+}
+
+.page-header {
+  align-self: flex-start;
+  width: 100%;
+}
+
+.pomodoro-card {
+  width: 100%;
+  max-width: 500px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  margin-top: 40px;
+}
+
+.mode-selector {
+  display: flex;
+  background: var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 4px;
+}
+
+.mode-btn {
+  padding: 10px 24px;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.mode-btn.active {
+  background: var(--surface-solid);
+  color: var(--primary-color);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.timer-display {
+  position: relative;
+  width: 250px;
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.timer-circle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.circle-bg {
+  fill: none;
+  stroke: var(--border-color);
+  stroke-width: 4;
+}
+
+.circle-progress {
+  fill: none;
+  stroke: var(--primary-color);
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-dasharray: 283;
+  transition: stroke-dashoffset 1s linear;
+}
+
+.time-text {
+  font-size: 4.5rem;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  color: var(--text-primary);
+  z-index: 2;
+}
+
+.timer-controls {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.control-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-solid);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.control-btn:hover {
+  background: var(--border-color);
+  color: var(--text-primary);
+}
+
+.control-btn.primary {
+  width: 72px;
+  height: 72px;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+}
+
+.control-btn.primary:hover {
+  background: var(--primary-hover);
+  transform: scale(1.05);
+}
+
+.control-btn.active {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.focus-sounds {
+  background: rgba(99, 102, 241, 0.1);
+  padding: 12px 24px;
+  border-radius: var(--radius-lg);
+  color: var(--primary-color);
+  font-size: 0.9rem;
+  font-weight: 500;
+  animation: fadeIn 0.3s ease;
+}
