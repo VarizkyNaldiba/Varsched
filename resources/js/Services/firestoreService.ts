@@ -130,3 +130,4 @@ export const deleteCloudTask = async (firestoreId: string) => {
         return false;
     }
 };
+
