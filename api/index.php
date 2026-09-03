@@ -36,12 +36,30 @@ putenv('APP_CONFIG_CACHE=/tmp/bootstrap/cache/config.php');
 putenv('APP_ROUTES_CACHE=/tmp/bootstrap/cache/routes.php');
 putenv('APP_EVENTS_CACHE=/tmp/bootstrap/cache/events.php');
 
-// Ensure APP_KEY exists
-if (empty($_ENV['APP_KEY']) && empty(getenv('APP_KEY'))) {
-    $fallbackKey = 'base64:tY3ISpij6qxZcZlbM8Dra3karPqvZQyY+e17ENJ1VHE=';
-    putenv("APP_KEY={$fallbackKey}");
-    $_ENV['APP_KEY'] = $fallbackKey;
-    $_SERVER['APP_KEY'] = $fallbackKey;
+// Sanitize critical environment variables to prevent empty string driver errors
+$criticalEnv = [
+    'SESSION_DRIVER' => 'cookie',
+    'CACHE_STORE' => 'array',
+    'QUEUE_CONNECTION' => 'sync',
+    'FILESYSTEM_DISK' => 'local',
+    'LOG_CHANNEL' => 'stderr',
+    'DB_CONNECTION' => 'sqlite',
+    'APP_MAINTENANCE_DRIVER' => 'file',
+    'APP_ENV' => 'production',
+    'APP_DEBUG' => 'true',
+    'APP_KEY' => 'base64:tY3ISpij6qxZcZlbM8Dra3karPqvZQyY+e17ENJ1VHE=',
+];
+
+foreach ($criticalEnv as $key => $default) {
+    $val = getenv($key);
+    if ($val === false || trim((string) $val) === '') {
+        $val = $_ENV[$key] ?? '';
+    }
+    if ($val === false || trim((string) $val) === '') {
+        putenv("{$key}={$default}");
+        $_ENV[$key] = $default;
+        $_SERVER[$key] = $default;
+    }
 }
 
 // Support SQLite fallback

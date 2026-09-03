@@ -2,11 +2,13 @@ import Modal from '@/Components/Modal';
 import { useForm } from '@inertiajs/react';
 import { Plus, X, AlertCircle } from 'lucide-react';
 import { FormEvent, useEffect } from 'react';
+import { addCloudTask } from '@/Services/firestoreService';
 
 interface CreateTaskModalProps {
     isOpen: boolean;
     presetCategory: string | null;
     availableCategories: string[];
+    authUserId?: number;
     onClose: () => void;
 }
 
@@ -17,6 +19,7 @@ export default function CreateTaskModal({
     isOpen,
     presetCategory,
     availableCategories,
+    authUserId,
     onClose,
 }: CreateTaskModalProps) {
     const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
@@ -44,6 +47,15 @@ export default function CreateTaskModal({
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
+        if (authUserId) {
+            addCloudTask(authUserId, {
+                title: data.title,
+                category: data.category || 'General',
+                status: data.status,
+                priority: data.priority,
+                deadline: data.deadline,
+            });
+        }
         post(route('tasks.store'), {
             onSuccess: () => {
                 reset();

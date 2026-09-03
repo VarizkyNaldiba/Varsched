@@ -25,4 +25,24 @@ if ($storagePath = ($_ENV['LARAVEL_STORAGE_PATH'] ?? $_SERVER['LARAVEL_STORAGE_P
     $app->useStoragePath($storagePath);
 }
 
+// Fallback safeguard: ensure critical drivers are never empty strings
+$app->booting(function () use ($app) {
+    $config = $app['config'];
+    if (empty($config->get('session.driver'))) {
+        $config->set('session.driver', 'cookie');
+    }
+    if (empty($config->get('cache.default'))) {
+        $config->set('cache.default', 'array');
+    }
+    if (empty($config->get('queue.default'))) {
+        $config->set('queue.default', 'sync');
+    }
+    if (empty($config->get('filesystems.default'))) {
+        $config->set('filesystems.default', 'local');
+    }
+    if (empty($config->get('app.maintenance.driver'))) {
+        $config->set('app.maintenance.driver', 'file');
+    }
+});
+
 return $app;

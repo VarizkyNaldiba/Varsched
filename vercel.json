@@ -30,6 +30,9 @@
     "APP_KEY": "base64:tY3ISpij6qxZcZlbM8Dra3karPqvZQyY+e17ENJ1VHE=",
     "SESSION_DRIVER": "cookie",
     "LOG_CHANNEL": "stderr",
-    "CACHE_STORE": "array"
+    "CACHE_STORE": "array",
+    "QUEUE_CONNECTION": "sync",
+    "FILESYSTEM_DISK": "local",
+    "APP_MAINTENANCE_DRIVER": "file"
   }
 }
