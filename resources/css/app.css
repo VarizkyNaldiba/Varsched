@@ -1,3 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-surface-base text-gray-900;
+  }
+}
+
+@layer utilities {
+  .bounce-scale {
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+  }
+  .bounce-scale:active {
+    transform: scale(0.95);
+  }
+  
+  .glow-pulse {
+    animation: glow-pulse 2s infinite;
+  }
+  
+  @keyframes glow-pulse {
+    0% { opacity: 0.8; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.02); }
+    100% { opacity: 0.8; transform: scale(1); }
+  }
+}

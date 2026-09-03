@@ -20,8 +20,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
 
-    Route::get('/calendar', function () {
-        return Inertia::render('CalendarView');
+    Route::get('/calendar', function (\Illuminate\Http\Request $request) {
+        return Inertia::render('CalendarView', [
+            'tasks' => $request->user()->tasks()->get()
+        ]);
     })->name('calendar');
 
     Route::get('/pomodoro', function () {

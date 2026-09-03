@@ -20,11 +20,20 @@ class TaskController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        if (empty($request->deadline)) {
+            $request->merge(['deadline' => null]);
+        }
+        if (empty($request->start_time)) {
+            $request->merge(['start_time' => null]);
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'category' => 'nullable|string|max:255',
             'status' => 'required|in:todo,in-progress,done',
             'priority' => 'required|in:low,medium,high',
             'deadline' => 'nullable|date',
+            'start_time' => 'nullable|date_format:H:i',
         ]);
 
         $request->user()->tasks()->create($validated);
@@ -36,6 +45,13 @@ class TaskController extends Controller
     {
         if ($task->user_id !== $request->user()->id) {
             abort(403);
+        }
+
+        if (empty($request->deadline)) {
+            $request->merge(['deadline' => null]);
+        }
+        if (empty($request->start_time)) {
+            $request->merge(['start_time' => null]);
         }
 
         $validated = $request->validate([
