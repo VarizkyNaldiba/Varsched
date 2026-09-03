@@ -100,15 +100,6 @@ export default function TasksIndex({ tasks }: Props) {
                             <p className="text-sm text-gray-500 dark:text-gray-400">
                                 Manage and organize your tasks separated into category cards
                             </p>
-                            {isFirebaseActive ? (
-                                <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/40">
-                                    <Cloud size={12} /> Firebase Realtime
-                                </span>
-                            ) : (
-                                <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 border border-gray-200 dark:border-gray-700">
-                                    <Database size={12} /> Local / SQLite
-                                </span>
-                            )}
                         </div>
                     </div>
                     <button

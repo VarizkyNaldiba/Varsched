@@ -17,6 +17,7 @@ export default {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
             colors: {
+                // Flip7 Core Brand Palette
                 primary: {
                     DEFAULT: '#2BA8A2',
                     light: '#3CC4BD',
@@ -38,9 +39,29 @@ export default {
                 surface: {
                     base: '#EFF8F7',
                     card: '#FFFFFF',
+                    'dark-base': '#0E201F',
+                    'dark-card': '#162E2C',
+                    'dark-elevated': '#1D3C39',
+                    'dark-border': '#254E4A',
                 },
                 success: '#27AE60',
                 error: '#E74C3C',
+
+                // Flip7 Retro-Playful Midnight Teal Grays for Dark Mode
+                gray: {
+                    50: '#F5FAF9',
+                    100: '#E7F4F3',
+                    200: '#D0E9E7',
+                    300: '#A6D5D1',
+                    400: '#73B4B0',
+                    500: '#4D948F',
+                    600: '#34716D',
+                    700: '#254E4A', // Flip7 dark borders & input seams
+                    800: '#162E2C', // Flip7 dark card & panel background
+                    850: '#122625',
+                    900: '#0E201F', // Flip7 deep midnight teal page background
+                    950: '#081413',
+                },
             },
             boxShadow: {
                 'sm': '0 2px 8px rgba(0, 0, 0, 0.08)',

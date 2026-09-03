@@ -6,7 +6,7 @@ export default function Authenticated({
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
     return (
-        <div className="min-h-screen bg-surface-base dark:bg-gray-900 transition-colors duration-300">
+        <div className="min-h-screen bg-surface-base dark:bg-surface-dark-base text-gray-900 dark:text-cream transition-colors duration-300">
             <Navbar />
 
             {header && (
