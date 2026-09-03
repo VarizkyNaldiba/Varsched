@@ -1,6 +1,6 @@
 import { Habit } from '../types';
 import { router } from '@inertiajs/react';
-import { Activity } from 'lucide-react';
+import { Activity, Check } from 'lucide-react';
 
 interface HabitTrackerProps {
     habits: Habit[];
@@ -67,7 +67,7 @@ export default function HabitTracker({ habits }: HabitTrackerProps) {
                                                 day.done ? 'Done' : 'Not done'
                                             }`}
                                         >
-                                            {day.done && <span className="text-xs font-bold">✓</span>}
+                                            {day.done && <Check size={14} strokeWidth={3} />}
                                         </button>
                                         <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500">
                                             {day.dayName.charAt(0)}

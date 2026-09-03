@@ -26,10 +26,10 @@
   "outputDirectory": "public",
   "env": {
     "APP_ENV": "production",
-    "APP_DEBUG": "false",
+    "APP_DEBUG": "true",
+    "APP_KEY": "base64:tY3ISpij6qxZcZlbM8Dra3karPqvZQyY+e17ENJ1VHE=",
     "SESSION_DRIVER": "cookie",
     "LOG_CHANNEL": "stderr",
     "CACHE_STORE": "array"
   }
 }
-

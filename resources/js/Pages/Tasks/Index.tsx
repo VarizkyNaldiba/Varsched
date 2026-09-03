@@ -5,7 +5,7 @@ import TasksSummaryBar from './Partials/TasksSummaryBar';
 import CategoryCard from './Partials/CategoryCard';
 import CreateTaskModal from './Partials/CreateTaskModal';
 import { CATEGORY_THEMES } from './Partials/themes';
-import { Plus } from 'lucide-react';
+import { Plus, ListTodo, FolderArchive } from 'lucide-react';
 import { useState } from 'react';
 
 interface Props {
@@ -81,7 +81,10 @@ export default function TasksIndex({ tasks }: Props) {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
                         <h2 className="font-extrabold text-3xl text-gray-900 dark:text-gray-100 flex items-center gap-3">
-                            <span>🎯</span> Tasks by Category
+                            <span className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400">
+                                <ListTodo size={24} strokeWidth={2.5} />
+                            </span>
+                            <span>Tasks by Category</span>
                         </h2>
                         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                             Manage and organize your tasks separated into category cards
@@ -115,7 +118,9 @@ export default function TasksIndex({ tasks }: Props) {
                     {/* Category Cards Grid */}
                     {categories.length === 0 ? (
                         <div className="text-center py-20 bg-white/50 dark:bg-gray-800/50 rounded-3xl border-2 border-dashed border-gray-300 dark:border-gray-700 p-8">
-                            <div className="text-6xl mb-4">📂</div>
+                            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-500 flex items-center justify-center">
+                                <FolderArchive size={32} />
+                            </div>
                             <h3 className="text-2xl font-bold text-gray-700 dark:text-gray-300">
                                 No categories or tasks yet
                             </h3>

@@ -1,7 +1,7 @@
 import { Task } from '../types';
 import { CategoryTheme } from './themes';
 import TaskItem from './TaskItem';
-import { Folder, Plus, ChevronDown } from 'lucide-react';
+import { Folder, Plus, ChevronDown, ChevronRight } from 'lucide-react';
 
 interface CategoryCardProps {
     category: string;
@@ -96,9 +96,8 @@ export default function CategoryCard({
                         onClick={() => onToggleCollapse(category)}
                         className="mt-3 pt-2 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer flex items-center justify-center gap-1.5 transition border-t border-gray-200/50 dark:border-gray-700/50"
                     >
-                        <span>
-                             Card minimized • Click to show {totalCount} {totalCount === 1 ? 'task' : 'tasks'}
-                        </span>
+                        <ChevronRight size={14} className="text-indigo-500" />
+                        <span>Card minimized • Click to show {totalCount} {totalCount === 1 ? 'task' : 'tasks'}</span>
                     </div>
                 )}
             </div>

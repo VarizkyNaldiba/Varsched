@@ -2,7 +2,7 @@ import { Head } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import SchedulePanel from './Partials/SchedulePanel';
 import { Task } from '@/types/task';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
 import { useState } from 'react';
 
 interface Props {
@@ -58,7 +58,10 @@ export default function CalendarIndex({ tasks = [] }: Props) {
         <AuthenticatedLayout
             header={
                 <h2 className="font-extrabold text-4xl tracking-wide text-primary-dark dark:text-gray-100 flex items-center gap-3">
-                    <span className="text-4xl">📅</span> Calendar
+                    <span className="p-2 rounded-2xl bg-primary-bg dark:bg-primary-dark/30 text-primary">
+                        <CalendarIcon size={28} strokeWidth={2.5} />
+                    </span>
+                    <span>Calendar</span>
                 </h2>
             }
         >

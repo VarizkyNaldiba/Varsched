@@ -138,8 +138,9 @@ export default function PomodoroIndex() {
                         </div>
 
                         {soundEnabled && (
-                            <div className="bg-indigo-50 dark:bg-indigo-900/30 px-6 py-3 rounded-lg text-indigo-700 dark:text-indigo-300 text-sm font-medium animate-pulse">
-                                🎵 Playing Rain & Cafe Ambience
+                            <div className="bg-indigo-50 dark:bg-indigo-900/30 px-6 py-3 rounded-lg text-indigo-700 dark:text-indigo-300 text-sm font-medium animate-pulse flex items-center gap-2">
+                                <Music size={16} />
+                                <span>Playing Rain & Cafe Ambience</span>
                             </div>
                         )}
                     </div>
