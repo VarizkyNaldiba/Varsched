@@ -1,7 +1,7 @@
 import { CalendarCheck } from 'lucide-react';
-import { SVGAttributes } from 'react';
+import { HTMLAttributes } from 'react';
 
-export default function ApplicationLogo(props: SVGAttributes<SVGElement>) {
+export default function ApplicationLogo(props: HTMLAttributes<HTMLDivElement>) {
     return (
         <div className="flex items-center gap-4 group cursor-pointer" {...props}>
             <div className="relative flex items-center justify-center w-14 h-14">

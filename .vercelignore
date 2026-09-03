@@ -1,0 +1,11 @@
+/vendor
+/node_modules
+/.git
+/.agents
+/agents
+/tests
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+
