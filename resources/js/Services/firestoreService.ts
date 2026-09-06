@@ -47,6 +47,7 @@ export const subscribeUserTasks = (
                         status: data.status || 'todo',
                         priority: data.priority || 'medium',
                         deadline: data.deadline || '',
+                        start_time: data.start_time || null,
                         completed_at: data.completed_at || null,
                         firestore_id: docSnap.id,
                     } as Task & { firestore_id?: string });
@@ -75,6 +76,7 @@ export const addCloudTask = async (
         status: string;
         priority: string;
         deadline?: string;
+        start_time?: string;
     }
 ) => {
     if (!isFirebaseConfigured() || !db) return null;

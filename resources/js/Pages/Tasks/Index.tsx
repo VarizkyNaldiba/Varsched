@@ -102,13 +102,6 @@ export default function TasksIndex({ tasks }: Props) {
                             </p>
                         </div>
                     </div>
-                    <button
-                        onClick={() => openCreateModal()}
-                        className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/25 transition-all hover:scale-105 active:scale-95 cursor-pointer shrink-0"
-                    >
-                        <Plus size={20} strokeWidth={2.5} />
-                        <span>Create Task</span>
-                    </button>
                 </div>
             }
         >

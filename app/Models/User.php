@@ -23,6 +23,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'last_login_at',
+        'last_login_ip',
     ];
 
     /**
@@ -44,8 +47,17 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'last_login_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Check if user is an administrator.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
     }
 
     /**
@@ -62,5 +74,13 @@ class User extends Authenticatable
     public function habits(): HasMany
     {
         return $this->hasMany(Habit::class);
+    }
+
+    /**
+     * Get the activity logs for the user.
+     */
+    public function activityLogs(): HasMany
+    {
+        return $this->hasMany(ActivityLog::class);
     }
 }

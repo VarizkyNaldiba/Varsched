@@ -1,3 +1,4 @@
+import GoogleSignInButton from '@/Components/GoogleSignInButton';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
@@ -25,6 +26,21 @@ export default function Register() {
     return (
         <GuestLayout>
             <Head title="Register" />
+
+            <div className="mb-6">
+                <GoogleSignInButton text="Daftar dengan Google" />
+
+                <div className="relative my-6">
+                    <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-200 dark:border-gray-700" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-white dark:bg-gray-800 px-3 text-gray-500 font-bold">
+                            atau daftar dengan email
+                        </span>
+                    </div>
+                </div>
+            </div>
 
             <form onSubmit={submit}>
                 <div>

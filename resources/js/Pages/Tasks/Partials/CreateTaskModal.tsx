@@ -1,8 +1,9 @@
 import Modal from '@/Components/Modal';
-import { useForm } from '@inertiajs/react';
-import { Plus, X, AlertCircle } from 'lucide-react';
+import { useForm, usePage } from '@inertiajs/react';
+import { Plus, X, AlertCircle, Mail } from 'lucide-react';
 import { FormEvent, useEffect } from 'react';
 import { addCloudTask } from '@/Services/firestoreService';
+import { PageProps } from '@/types';
 
 interface CreateTaskModalProps {
     isOpen: boolean;
@@ -22,6 +23,7 @@ export default function CreateTaskModal({
     authUserId,
     onClose,
 }: CreateTaskModalProps) {
+    const { auth } = usePage<PageProps>().props;
     const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
         title: '',
         category: '',
@@ -156,6 +158,11 @@ export default function CreateTaskModal({
                             <input type="time" value={data.start_time} onChange={(e) => setData('start_time', e.target.value)} required className={inputClass} />
                             {errors.start_time && <p className="text-rose-500 text-xs mt-1">{errors.start_time}</p>}
                         </div>
+                    </div>
+
+                    <div className="flex items-center gap-2.5 p-3 rounded-xl bg-primary-bg/70 dark:bg-primary-dark/20 text-primary-dark dark:text-primary-light border border-primary/20 text-xs font-semibold">
+                        <Mail size={16} className="shrink-0 text-primary" />
+                        <span>Notifikasi pengingat tugas akan otomatis dikirim ke email terdaftar: <strong className="font-bold underline">{auth?.user?.email}</strong></span>
                     </div>
 
                     <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700 mt-6">

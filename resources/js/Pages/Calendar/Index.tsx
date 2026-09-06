@@ -1,17 +1,39 @@
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import SchedulePanel from './Partials/SchedulePanel';
 import { Task } from '@/types/task';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
-import { useState } from 'react';
+import { PageProps } from '@/types';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Cloud, Database } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { isFirebaseConfigured } from '@/Services/firebase';
+import { subscribeUserTasks } from '@/Services/firestoreService';
 
 interface Props {
     tasks?: Task[];
 }
 
 export default function CalendarIndex({ tasks = [] }: Props) {
+    const { auth } = usePage<PageProps>().props;
+    const [activeTasks, setActiveTasks] = useState<Task[]>(tasks);
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+    const isFirebaseActive = isFirebaseConfigured();
+
+    useEffect(() => {
+        setActiveTasks(tasks);
+    }, [tasks]);
+
+    useEffect(() => {
+        if (!isFirebaseActive || !auth?.user?.id) return;
+        const unsubscribe = subscribeUserTasks(auth.user.id, (cloudTasks) => {
+            if (cloudTasks.length > 0) {
+                setActiveTasks(cloudTasks);
+            }
+        });
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
+    }, [auth?.user?.id, isFirebaseActive]);
 
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
@@ -35,7 +57,7 @@ export default function CalendarIndex({ tasks = [] }: Props) {
     };
 
     const getTasksForDate = (dateStr: string) => {
-        return tasks.filter((t) => t.deadline === dateStr);
+        return activeTasks.filter((t) => t.deadline === dateStr);
     };
 
     const getPriorityColor = (priority: string) => {
@@ -57,12 +79,24 @@ export default function CalendarIndex({ tasks = [] }: Props) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="font-extrabold text-4xl tracking-wide text-primary-dark dark:text-gray-100 flex items-center gap-3">
-                    <span className="p-2 rounded-2xl bg-primary-bg dark:bg-primary-dark/30 text-primary">
-                        <CalendarIcon size={28} strokeWidth={2.5} />
-                    </span>
-                    <span>Calendar</span>
-                </h2>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <h2 className="font-extrabold text-4xl tracking-wide text-primary-dark dark:text-gray-100 flex items-center gap-3">
+                        <span className="p-2 rounded-2xl bg-primary-bg dark:bg-primary-dark/30 text-primary">
+                            <CalendarIcon size={28} strokeWidth={2.5} />
+                        </span>
+                        <span>Calendar</span>
+                    </h2>
+                    {isFirebaseActive ? (
+                        <span className="inline-flex items-center gap-2 text-xs font-bold px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/40 shadow-sm">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <Cloud size={14} /> Firebase Cloud Connected
+                        </span>
+                    ) : (
+                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 border border-gray-200 dark:border-gray-700">
+                            <Database size={13} /> Local / SQLite Storage
+                        </span>
+                    )}
+                </div>
             }
         >
             <Head title="Calendar" />

@@ -20,15 +20,49 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Find existing user (e.g. Varizky) or create test user
-        $user = User::first();
+        // 1. Create Default Admin Account requested by user: admin@2varsched (pass: 12345ada)
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@2varsched'],
+            [
+                'name' => 'Admin Varsched',
+                'password' => Hash::make('12345ada'),
+                'role' => 'admin',
+                'email_verified_at' => now(),
+            ]
+        );
+        $admin->update([
+            'role' => 'admin',
+            'password' => Hash::make('12345ada'),
+        ]);
+
+        // Convenient alias for RFC-compliant environments: admin@2varsched.com
+        $adminAlias = User::firstOrCreate(
+            ['email' => 'admin@2varsched.com'],
+            [
+                'name' => 'Admin Varsched',
+                'password' => Hash::make('12345ada'),
+                'role' => 'admin',
+                'email_verified_at' => now(),
+            ]
+        );
+        $adminAlias->update([
+            'role' => 'admin',
+            'password' => Hash::make('12345ada'),
+        ]);
+
+        // 2. Find or create default regular user
+        $user = User::where('role', '!=', 'admin')->first();
 
         if (!$user) {
-            $user = User::create([
-                'name' => 'Varizky Naldiba Rimra',
-                'email' => 'varizkynr@gmail.com',
-                'password' => Hash::make('12345678'),
-            ]);
+            $user = User::firstOrCreate(
+                ['email' => 'varizkynr@gmail.com'],
+                [
+                    'name' => 'Varizky Naldiba Rimra',
+                    'password' => Hash::make('12345678'),
+                    'role' => 'user',
+                    'email_verified_at' => now(),
+                ]
+            );
         }
 
         // Clean up previous tasks and habits if needed, or populate if empty

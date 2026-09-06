@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Tasks\StoreTaskRequest;
 use App\Http\Requests\Tasks\UpdateTaskRequest;
 use App\Models\Task;
+use App\Notifications\TaskReminderNotification;
+use App\Services\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -23,7 +26,16 @@ class TaskController extends Controller
 
     public function store(StoreTaskRequest $request): RedirectResponse
     {
-        $request->user()->tasks()->create($request->validated());
+        $user = $request->user();
+        $task = $user->tasks()->create($request->validated());
+
+        ActivityLogger::log('TASK_CREATE', "Tugas baru dibuat: '{$task->title}' [{$task->category}]", $user, $request);
+
+        try {
+            $user->notify(new TaskReminderNotification($task));
+        } catch (\Throwable $e) {
+            Log::warning('Task email notification failed: ' . $e->getMessage());
+        }
 
         return back();
     }
@@ -41,6 +53,8 @@ class TaskController extends Controller
 
         $task->update($data);
 
+        ActivityLogger::log('TASK_UPDATE', "Tugas '{$task->title}' diperbarui (status: {$task->status}).", $request->user(), $request);
+
         return back();
     }
 
@@ -50,7 +64,10 @@ class TaskController extends Controller
             abort(403);
         }
 
+        $title = $task->title;
         $task->delete();
+
+        ActivityLogger::log('TASK_DELETE', "Tugas '{$title}' dihapus.", $request->user(), $request);
 
         return back();
     }

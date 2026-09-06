@@ -1,4 +1,4 @@
-import Navbar from '@/Components/Navigation/Navbar';
+import Sidebar from '@/Components/Navigation/Sidebar';
 import { PropsWithChildren, ReactNode } from 'react';
 
 export default function Authenticated({
@@ -6,18 +6,20 @@ export default function Authenticated({
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
     return (
-        <div className="min-h-screen bg-surface-base dark:bg-surface-dark-base text-gray-900 dark:text-cream transition-colors duration-300">
-            <Navbar />
+        <div className="min-h-screen bg-surface-base dark:bg-surface-dark-base text-gray-900 dark:text-cream transition-colors duration-300 flex flex-col">
+            <Sidebar />
 
-            {header && (
-                <header className="bg-transparent">
-                    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                        {header}
-                    </div>
-                </header>
-            )}
+            <div className="lg:pl-64 flex flex-col flex-1">
+                {header && (
+                    <header className="bg-transparent">
+                        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+                            {header}
+                        </div>
+                    </header>
+                )}
 
-            <main>{children}</main>
+                <main className="flex-1">{children}</main>
+            </div>
         </div>
     );
 }
