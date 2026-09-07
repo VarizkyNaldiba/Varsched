@@ -84,18 +84,8 @@ export default function CalendarIndex({ tasks = [] }: Props) {
                         <span className="p-2 rounded-2xl bg-primary-bg dark:bg-primary-dark/30 text-primary">
                             <CalendarIcon size={28} strokeWidth={2.5} />
                         </span>
-                        <span>Calendar</span>
+                        <span>Kalender Agenda</span>
                     </h2>
-                    {isFirebaseActive ? (
-                        <span className="inline-flex items-center gap-2 text-xs font-bold px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/40 shadow-sm">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <Cloud size={14} /> Firebase Cloud Connected
-                        </span>
-                    ) : (
-                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 border border-gray-200 dark:border-gray-700">
-                            <Database size={13} /> Local / SQLite Storage
-                        </span>
-                    )}
                 </div>
             }
         >
@@ -144,16 +134,20 @@ export default function CalendarIndex({ tasks = [] }: Props) {
                                 const day = i + 1;
                                 const dateStr = formatDateStr(new Date(year, month, day));
                                 const tasksOnDay = getTasksForDate(dateStr);
-                                const isToday = dateStr === formatDateStr(new Date());
+                                const todayStr = formatDateStr(new Date());
+                                const isToday = dateStr === todayStr;
+                                const isPast = dateStr < todayStr;
 
                                 return (
                                     <div
                                         key={day}
                                         onClick={() => setSelectedDate(new Date(year, month, day))}
-                                        className={`min-h-[140px] p-3 border-[3px] rounded-[24px] flex flex-col gap-2 transition-all cursor-pointer bounce-scale
+                                        className={`min-h-[140px] p-3 border-[3px] rounded-[24px] flex flex-col gap-2 transition-all cursor-pointer bounce-scale relative overflow-hidden
                                             ${
                                                 isToday
                                                     ? 'bg-primary-bg dark:bg-primary-dark/20 border-primary-light shadow-teal-glow'
+                                                    : isPast
+                                                    ? 'bg-gray-100/60 dark:bg-gray-900/60 border-gray-200 dark:border-gray-800 opacity-75'
                                                     : 'bg-surface-base dark:bg-gray-900/50 border-white hover:border-primary-light dark:border-gray-800'
                                             }`}
                                     >
@@ -162,25 +156,37 @@ export default function CalendarIndex({ tasks = [] }: Props) {
                                                 className={`font-extrabold w-8 h-8 flex items-center justify-center rounded-full text-lg ${
                                                     isToday
                                                         ? 'bg-primary text-white shadow-md'
+                                                        : isPast
+                                                        ? 'text-gray-400 dark:text-gray-500'
                                                         : 'text-primary-dark dark:text-primary-light'
                                                 }`}
                                             >
                                                 {day}
                                             </span>
-                                            {tasksOnDay.length > 0 && (
-                                                <span className="text-[11px] font-bold bg-accent text-primary-dark px-2 py-1 rounded-full shadow-accent-glow">
-                                                    {tasksOnDay.length}
-                                                </span>
-                                            )}
+                                            <div className="flex items-center gap-1">
+                                                {isPast && (
+                                                    <span
+                                                        className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-600 dark:bg-red-950/60 dark:text-red-400 font-black text-xs"
+                                                        title="Tanggal telah lewat"
+                                                    >
+                                                        ✕
+                                                    </span>
+                                                )}
+                                                {tasksOnDay.length > 0 && (
+                                                    <span className="text-[11px] font-bold bg-accent text-primary-dark px-2 py-1 rounded-full shadow-accent-glow">
+                                                        {tasksOnDay.length}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
 
-                                        <div className="flex flex-col gap-1.5 overflow-y-auto max-h-[85px] custom-scrollbar">
+                                        <div className="flex flex-col gap-1.5 overflow-y-auto max-h-[85px]">
                                             {tasksOnDay.map((task) => (
                                                 <div
                                                     key={task.id}
                                                     className={`text-[11px] px-2 py-1.5 rounded-lg border-l-[4px] truncate font-bold ${getPriorityColor(
                                                         task.priority
-                                                    )} ${task.status === 'done' ? 'line-through opacity-50' : ''}`}
+                                                    )} ${task.status === 'done' || isPast ? 'line-through opacity-60' : ''}`}
                                                 >
                                                     {task.start_time ? `${task.start_time.substring(0, 5)} ` : ''}
                                                     {task.title}

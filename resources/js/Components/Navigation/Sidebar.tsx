@@ -87,12 +87,6 @@ export default function Sidebar() {
             active: route().current('calendar'),
             icon: Calendar,
         },
-        {
-            name: 'Pomodoro',
-            href: route('pomodoro'),
-            active: route().current('pomodoro'),
-            icon: Timer,
-        },
     ];
 
     const isAdmin = user.role === 'admin';
@@ -125,7 +119,7 @@ export default function Sidebar() {
     ];
 
     const sidebarContent = (
-        <div className="flex flex-col h-full justify-between p-5 overflow-y-auto custom-scrollbar">
+        <div className="flex flex-col h-full justify-between p-5 overflow-y-auto">
             {/* Top: Logo & Navigation */}
             <div className="space-y-6">
                 {/* Brand Header */}
@@ -140,22 +134,6 @@ export default function Sidebar() {
                     >
                         <X size={22} />
                     </button>
-                </div>
-
-                {/* Status Pill */}
-                <div className="px-2">
-                    {isFirebaseActive ? (
-                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/40 text-emerald-700 dark:text-emerald-300 text-xs font-bold">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <Cloud size={13} className="shrink-0" />
-                            <span>Firebase Cloud</span>
-                        </div>
-                    ) : (
-                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 text-xs font-semibold">
-                            <Database size={13} className="shrink-0" />
-                            <span>Local Storage</span>
-                        </div>
-                    )}
                 </div>
 
                 {/* Nav Links */}

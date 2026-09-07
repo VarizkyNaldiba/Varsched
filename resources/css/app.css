@@ -6,6 +6,17 @@
   body {
     @apply bg-surface-base text-gray-900 dark:bg-surface-dark-base dark:text-cream;
   }
+  
+  /* Hide scrollbars globally */
+  * {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+  *::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
 }
 
 @layer utilities {

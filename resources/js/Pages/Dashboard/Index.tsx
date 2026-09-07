@@ -1,55 +1,95 @@
-import { Head } from '@inertiajs/react';
+import { Head, usePage, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { DashboardStats, TrendDay, Habit } from './types';
+import { DashboardProps } from './types';
+import { Task } from '@/types/task';
+import { PageProps } from '@/types';
 import StatCards from './Partials/StatCards';
 import ProductivityChart from './Partials/ProductivityChart';
 import HabitTracker from './Partials/HabitTracker';
+import UpcomingTasksWidget from './Partials/UpcomingTasksWidget';
 import { isFirebaseConfigured } from '@/Services/firebase';
-import { Cloud, Database } from 'lucide-react';
-
-interface DashboardProps {
-    stats?: DashboardStats;
-    productivityTrends?: TrendDay[];
-    habits?: Habit[];
-}
+import { subscribeUserTasks, updateCloudTask } from '@/Services/firestoreService';
+import { LayoutDashboard } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 export default function Dashboard({
     stats = { completedTasks: 0, pendingTasks: 0, streak: 0 },
     productivityTrends = [],
     habits = [],
+    upcomingTasks = [],
 }: DashboardProps) {
+    const { auth } = usePage<PageProps>().props;
     const isFirebaseActive = isFirebaseConfigured();
+
+    const [activeTasks, setActiveTasks] = useState<Task[]>(upcomingTasks);
+    const [currentStats, setCurrentStats] = useState(stats);
+
+    useEffect(() => {
+        setActiveTasks(upcomingTasks);
+        setCurrentStats(stats);
+    }, [upcomingTasks, stats]);
+
+    useEffect(() => {
+        if (!isFirebaseActive || !auth?.user?.id) return;
+        const unsubscribe = subscribeUserTasks(auth.user.id, (cloudTasks) => {
+            if (cloudTasks.length > 0) {
+                setActiveTasks(cloudTasks);
+                const completed = cloudTasks.filter((t) => t.status === 'done').length;
+                const pending = cloudTasks.filter((t) => t.status !== 'done').length;
+                setCurrentStats((prev) => ({
+                    ...prev,
+                    completedTasks: completed,
+                    pendingTasks: pending,
+                }));
+            }
+        });
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
+    }, [auth?.user?.id, isFirebaseActive]);
+
+    const handleUpdateStatus = (task: Task, newStatus: string) => {
+        if (task.firestore_id) {
+            updateCloudTask(task.firestore_id, { status: newStatus as any });
+        }
+        router.patch(route('tasks.update', task.id), { status: newStatus }, { preserveScroll: true });
+    };
 
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex items-center justify-between">
-                    <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                        Dashboard
+                <div>
+                    <h2 className="font-extrabold text-3xl text-gray-900 dark:text-gray-100 flex items-center gap-3">
+                        <span className="p-2 rounded-2xl bg-primary-bg dark:bg-primary-dark/30 text-primary">
+                            <LayoutDashboard size={28} strokeWidth={2.5} />
+                        </span>
+                        <span>Dashboard Produktivitas</span>
                     </h2>
-                    {isFirebaseActive ? (
-                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/40">
-                            <Cloud size={13} /> Firebase Cloud Connected
-                        </span>
-                    ) : (
-                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 border border-gray-200 dark:border-gray-700">
-                            <Database size={13} /> Local / SQLite Storage
-                        </span>
-                    )}
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        Selamat datang kembali, <span className="font-bold text-gray-800 dark:text-gray-200">{auth?.user?.name}</span>! Berikut ringkasan aktivitas dan tugas Anda.
+                    </p>
                 </div>
             }
         >
             <Head title="Dashboard" />
 
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 flex flex-col gap-6">
-                    <StatCards stats={stats} />
+            <div className="py-8 pb-20">
+                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 flex flex-col gap-8">
+
+                    {/* Stat Cards Overview */}
+                    <StatCards stats={currentStats} />
+
+                    {/* Deadline Task List & Productivity Chart */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <UpcomingTasksWidget tasks={activeTasks} onUpdateStatus={handleUpdateStatus} />
                         <ProductivityChart trends={productivityTrends} />
-                        <HabitTracker habits={habits} />
                     </div>
+
+                    {/* Habit Tracker Section */}
+                    <HabitTracker habits={habits} />
                 </div>
             </div>
         </AuthenticatedLayout>
     );
 }
+

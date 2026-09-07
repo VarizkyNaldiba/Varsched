@@ -1,3 +1,5 @@
+import { Task } from '@/types/task';
+
 export interface HabitDay {
     date: string;
     dayName: string;
@@ -22,4 +24,12 @@ export interface DashboardStats {
     pendingTasks: number;
     streak: number;
 }
+
+export interface DashboardProps {
+    stats?: DashboardStats;
+    productivityTrends?: TrendDay[];
+    habits?: Habit[];
+    upcomingTasks?: Task[];
+}
+
 

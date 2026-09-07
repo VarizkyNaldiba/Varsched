@@ -22,6 +22,17 @@ class DashboardController extends Controller
         return Inertia::render('Dashboard/Index', $dashboardData);
     }
 
+    public function storeHabit(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $this->dashboardService->storeHabit($request->user(), $validated['name']);
+
+        return back();
+    }
+
     public function toggleHabit(Request $request, Habit $habit): RedirectResponse
     {
         if ($habit->user_id !== $request->user()->id) {
@@ -29,6 +40,17 @@ class DashboardController extends Controller
         }
 
         $this->dashboardService->toggleHabit($habit, $request->input('date'));
+
+        return back();
+    }
+
+    public function destroyHabit(Request $request, Habit $habit): RedirectResponse
+    {
+        if ($habit->user_id !== $request->user()->id) {
+            abort(403);
+        }
+
+        $this->dashboardService->destroyHabit($habit);
 
         return back();
     }

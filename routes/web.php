@@ -7,7 +7,6 @@ use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\PomodoroController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
@@ -17,9 +16,11 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Dashboard
+    // Dashboard & Habits
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/habits', [DashboardController::class, 'storeHabit'])->name('habits.store');
     Route::post('/habits/{habit}/toggle', [DashboardController::class, 'toggleHabit'])->name('habits.toggle');
+    Route::delete('/habits/{habit}', [DashboardController::class, 'destroyHabit'])->name('habits.destroy');
 
     // Tasks
     Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
@@ -29,9 +30,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Calendar
     Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar');
-
-    // Pomodoro
-    Route::get('/pomodoro', [PomodoroController::class, 'index'])->name('pomodoro');
 
     // Notifications
     Route::post('/notifications/send-reminder', [NotificationController::class, 'sendReminder'])->name('notifications.send-reminder');

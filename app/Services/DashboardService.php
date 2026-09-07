@@ -31,6 +31,18 @@ class DashboardService
         // 4. Habit Tracker with eager loading for current week
         $habits = $this->getHabitsForWeek($user, $startOfWeek, $endOfWeek);
 
+        // 5. Pending tasks ordered by closest deadline first (top list, excluding past deadlines)
+        $todayStr = Carbon::today()->toDateString();
+        $upcomingTasks = (clone $tasksQuery)
+            ->where('status', '!=', 'done')
+            ->where(function ($q) use ($todayStr) {
+                $q->whereNull('deadline')
+                  ->orWhere('deadline', '')
+                  ->orWhere('deadline', '>=', $todayStr);
+            })
+            ->orderByRaw('CASE WHEN deadline IS NULL OR deadline = "" THEN 1 ELSE 0 END, deadline ASC')
+            ->get();
+
         return [
             'stats' => [
                 'completedTasks' => $completedTasks,
@@ -39,6 +51,7 @@ class DashboardService
             ],
             'productivityTrends' => $productivityTrends,
             'habits' => $habits,
+            'upcomingTasks' => $upcomingTasks,
         ];
     }
 
@@ -181,6 +194,26 @@ class DashboardService
                 'completed' => true,
             ]);
         }
+    }
+
+    /**
+     * Store a new habit for the user.
+     */
+    public function storeHabit(User $user, string $name): Habit
+    {
+        return Habit::create([
+            'user_id' => $user->id,
+            'name' => $name,
+        ]);
+    }
+
+    /**
+     * Delete a habit and its associated logs.
+     */
+    public function destroyHabit(Habit $habit): void
+    {
+        $habit->logs()->delete();
+        $habit->delete();
     }
 }
 

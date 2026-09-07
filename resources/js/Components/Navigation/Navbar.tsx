@@ -46,9 +46,6 @@ export default function Navbar() {
                             <NavLink href={route('calendar')} active={route().current('calendar')}>
                                 Calendar
                             </NavLink>
-                            <NavLink href={route('pomodoro')} active={route().current('pomodoro')}>
-                                Pomodoro
-                            </NavLink>
                         </div>
                     </div>
 
@@ -135,9 +132,6 @@ export default function Navbar() {
                     </ResponsiveNavLink>
                     <ResponsiveNavLink href={route('calendar')} active={route().current('calendar')}>
                         Calendar
-                    </ResponsiveNavLink>
-                    <ResponsiveNavLink href={route('pomodoro')} active={route().current('pomodoro')}>
-                        Pomodoro
                     </ResponsiveNavLink>
                 </div>
 
