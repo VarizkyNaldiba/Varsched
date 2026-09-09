@@ -33,13 +33,22 @@ class HandleInertiaRequests extends Middleware
         $taskSummary = null;
 
         if ($user) {
-            $tasks = $user->tasks();
-            $taskSummary = [
-                'all' => (clone $tasks)->count(),
-                'pending' => (clone $tasks)->where('status', 'todo')->count(),
-                'in_progress' => (clone $tasks)->whereIn('status', ['in-progress', 'in_progress'])->count(),
-                'done' => (clone $tasks)->where('status', 'done')->count(),
-            ];
+            try {
+                $tasks = $user->tasks();
+                $taskSummary = [
+                    'all' => (clone $tasks)->count(),
+                    'pending' => (clone $tasks)->where('status', 'todo')->count(),
+                    'in_progress' => (clone $tasks)->whereIn('status', ['in-progress', 'in_progress'])->count(),
+                    'done' => (clone $tasks)->where('status', 'done')->count(),
+                ];
+            } catch (\Throwable $e) {
+                $taskSummary = [
+                    'all' => 0,
+                    'pending' => 0,
+                    'in_progress' => 0,
+                    'done' => 0,
+                ];
+            }
         }
 
         return [

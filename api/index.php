@@ -43,7 +43,6 @@ $criticalEnv = [
     'QUEUE_CONNECTION' => 'sync',
     'FILESYSTEM_DISK' => 'local',
     'LOG_CHANNEL' => 'stderr',
-    'DB_CONNECTION' => 'mysql',
     'APP_MAINTENANCE_DRIVER' => 'file',
     'APP_ENV' => 'production',
     'APP_DEBUG' => 'true',
@@ -60,6 +59,29 @@ foreach ($criticalEnv as $key => $default) {
         $_ENV[$key] = $default;
         $_SERVER[$key] = $default;
     }
+}
+
+// Check database configuration for Vercel
+$dbHost = getenv('DB_HOST') ?: ($_ENV['DB_HOST'] ?? '127.0.0.1');
+
+// If no external remote MySQL host is defined on Vercel, fallback to SQLite in /tmp
+if ($dbHost === '127.0.0.1' || $dbHost === 'localhost' || trim((string)$dbHost) === '') {
+    $dbFile = '/tmp/database.sqlite';
+    if (!file_exists($dbFile) || filesize($dbFile) === 0) {
+        $sourceDb = __DIR__ . '/../database/database.sqlite';
+        if (file_exists($sourceDb) && filesize($sourceDb) > 0) {
+            @copy($sourceDb, $dbFile);
+        } else {
+            @touch($dbFile);
+        }
+    }
+    putenv('DB_CONNECTION=sqlite');
+    $_ENV['DB_CONNECTION'] = 'sqlite';
+    $_SERVER['DB_CONNECTION'] = 'sqlite';
+
+    putenv("DB_DATABASE={$dbFile}");
+    $_ENV['DB_DATABASE'] = $dbFile;
+    $_SERVER['DB_DATABASE'] = $dbFile;
 }
 
 // Forward to Laravel's public entrypoint with exception handling

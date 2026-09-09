@@ -19,45 +19,58 @@ class DashboardService
         $cacheKey = "user_{$user->id}_dashboard_data";
 
         return Cache::remember($cacheKey, 30, function () use ($user) {
-            $tasksQuery = $user->tasks();
+            try {
+                $tasksQuery = $user->tasks();
 
-            // 1. Task counts
-            $completedTasks = (clone $tasksQuery)->where('status', 'done')->count();
-            $pendingTasks = (clone $tasksQuery)->where('status', '!=', 'done')->count();
+                // 1. Task counts
+                $completedTasks = (clone $tasksQuery)->where('status', 'done')->count();
+                $pendingTasks = (clone $tasksQuery)->where('status', '!=', 'done')->count();
 
-            // 2. Streak calculation
-            $streak = $this->calculateStreak($user);
+                // 2. Streak calculation
+                $streak = $this->calculateStreak($user);
 
-            // 3. Productivity Trends (Current week Mon - Sun)
-            $startOfWeek = Carbon::now()->startOfWeek(Carbon::MONDAY);
-            $endOfWeek = Carbon::now()->endOfWeek(Carbon::SUNDAY);
-            $productivityTrends = $this->getProductivityTrends($user, $startOfWeek, $endOfWeek);
+                // 3. Productivity Trends (Current week Mon - Sun)
+                $startOfWeek = Carbon::now()->startOfWeek(Carbon::MONDAY);
+                $endOfWeek = Carbon::now()->endOfWeek(Carbon::SUNDAY);
+                $productivityTrends = $this->getProductivityTrends($user, $startOfWeek, $endOfWeek);
 
-            // 4. Habit Tracker with eager loading for current week
-            $habits = $this->getHabitsForWeek($user, $startOfWeek, $endOfWeek);
+                // 4. Habit Tracker with eager loading for current week
+                $habits = $this->getHabitsForWeek($user, $startOfWeek, $endOfWeek);
 
-            // 5. Pending tasks ordered by closest deadline first (top list, excluding past deadlines)
-            $todayStr = Carbon::today()->toDateString();
-            $upcomingTasks = (clone $tasksQuery)
-                ->where('status', '!=', 'done')
-                ->where(function ($q) use ($todayStr) {
-                    $q->whereNull('deadline')
-                      ->orWhere('deadline', '')
-                      ->orWhere('deadline', '>=', $todayStr);
-                })
-                ->orderByRaw('CASE WHEN deadline IS NULL OR deadline = "" THEN 1 ELSE 0 END, deadline ASC')
-                ->get();
+                // 5. Pending tasks ordered by closest deadline first (top list, excluding past deadlines)
+                $todayStr = Carbon::today()->toDateString();
+                $upcomingTasks = (clone $tasksQuery)
+                    ->where('status', '!=', 'done')
+                    ->where(function ($q) use ($todayStr) {
+                        $q->whereNull('deadline')
+                          ->orWhere('deadline', '')
+                          ->orWhere('deadline', '>=', $todayStr);
+                    })
+                    ->orderByRaw('CASE WHEN deadline IS NULL OR deadline = "" THEN 1 ELSE 0 END, deadline ASC')
+                    ->get();
 
-            return [
-                'stats' => [
-                    'completedTasks' => $completedTasks,
-                    'pendingTasks' => $pendingTasks,
-                    'streak' => $streak,
-                ],
-                'productivityTrends' => $productivityTrends,
-                'habits' => $habits,
-                'upcomingTasks' => $upcomingTasks,
-            ];
+                return [
+                    'stats' => [
+                        'completedTasks' => $completedTasks,
+                        'pendingTasks' => $pendingTasks,
+                        'streak' => $streak,
+                    ],
+                    'productivityTrends' => $productivityTrends,
+                    'habits' => $habits,
+                    'upcomingTasks' => $upcomingTasks,
+                ];
+            } catch (\Throwable $e) {
+                return [
+                    'stats' => [
+                        'completedTasks' => 0,
+                        'pendingTasks' => 0,
+                        'streak' => 0,
+                    ],
+                    'productivityTrends' => [],
+                    'habits' => [],
+                    'upcomingTasks' => [],
+                ];
+            }
         });
     }
 
