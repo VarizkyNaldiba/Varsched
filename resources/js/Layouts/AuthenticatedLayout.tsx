@@ -1,4 +1,5 @@
 import Sidebar from '@/Components/Navigation/Sidebar';
+import TaskSummaryWidget from '@/Components/Navigation/TaskSummaryWidget';
 import { PropsWithChildren, ReactNode, useState, useEffect } from 'react';
 import { usePage } from '@inertiajs/react';
 import { PageProps } from '@/types';
@@ -57,13 +58,15 @@ export default function Authenticated({
             <Sidebar />
 
             <div className="lg:pl-64 flex flex-col flex-1">
-                {header && (
-                    <header className="bg-transparent">
-                        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                            {header}
+                <header className="bg-transparent pt-6 pb-2">
+                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                        <div className="flex-1 min-w-0">{header}</div>
+                        {/* Top-Right Task Summary Bar Layout (Visible from any page) */}
+                        <div className="shrink-0 self-end md:self-auto">
+                            <TaskSummaryWidget />
                         </div>
-                    </header>
-                )}
+                    </div>
+                </header>
 
                 <main className="flex-1">{children}</main>
             </div>

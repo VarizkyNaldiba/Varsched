@@ -29,11 +29,25 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+        $taskSummary = null;
+
+        if ($user) {
+            $tasks = $user->tasks();
+            $taskSummary = [
+                'all' => (clone $tasks)->count(),
+                'pending' => (clone $tasks)->where('status', 'todo')->count(),
+                'in_progress' => (clone $tasks)->whereIn('status', ['in-progress', 'in_progress'])->count(),
+                'done' => (clone $tasks)->where('status', 'done')->count(),
+            ];
+        }
+
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user,
             ],
+            'taskSummary' => $taskSummary,
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
