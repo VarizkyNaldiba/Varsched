@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 
+use Illuminate\Support\Facades\Cache;
+
 class TaskController extends Controller
 {
     public function index(Request $request): Response
@@ -30,6 +32,7 @@ class TaskController extends Controller
         $task = $user->tasks()->create($request->validated());
 
         ActivityLogger::log('TASK_CREATE', "Tugas baru dibuat: '{$task->title}' [{$task->category}]", $user, $request);
+        Cache::forget("user_{$user->id}_dashboard_data");
 
         try {
             $user->notify(new TaskReminderNotification($task));
@@ -57,6 +60,7 @@ class TaskController extends Controller
             $task->update($data);
 
             ActivityLogger::log('TASK_UPDATE', "Tugas '{$task->title}' diperbarui (status: {$task->status}).", $request->user(), $request);
+            Cache::forget("user_{$request->user()->id}_dashboard_data");
         }
 
         return back()->with('success', 'Tugas berhasil diperbarui!');
@@ -71,6 +75,7 @@ class TaskController extends Controller
             $task->delete();
 
             ActivityLogger::log('TASK_DELETE', "Tugas '{$title}' dihapus.", $request->user(), $request);
+            Cache::forget("user_{$request->user()->id}_dashboard_data");
         }
 
         return back()->with('success', 'Tugas berhasil dihapus!');

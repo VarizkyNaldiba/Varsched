@@ -7,6 +7,8 @@ use App\Models\HabitLog;
 use App\Models\User;
 use Carbon\Carbon;
 
+use Illuminate\Support\Facades\Cache;
+
 class DashboardService
 {
     /**
@@ -14,45 +16,49 @@ class DashboardService
      */
     public function getDashboardData(User $user): array
     {
-        $tasksQuery = $user->tasks();
+        $cacheKey = "user_{$user->id}_dashboard_data";
 
-        // 1. Task counts
-        $completedTasks = (clone $tasksQuery)->where('status', 'done')->count();
-        $pendingTasks = (clone $tasksQuery)->where('status', '!=', 'done')->count();
+        return Cache::remember($cacheKey, 30, function () use ($user) {
+            $tasksQuery = $user->tasks();
 
-        // 2. Streak calculation
-        $streak = $this->calculateStreak($user);
+            // 1. Task counts
+            $completedTasks = (clone $tasksQuery)->where('status', 'done')->count();
+            $pendingTasks = (clone $tasksQuery)->where('status', '!=', 'done')->count();
 
-        // 3. Productivity Trends (Current week Mon - Sun)
-        $startOfWeek = Carbon::now()->startOfWeek(Carbon::MONDAY);
-        $endOfWeek = Carbon::now()->endOfWeek(Carbon::SUNDAY);
-        $productivityTrends = $this->getProductivityTrends($user, $startOfWeek, $endOfWeek);
+            // 2. Streak calculation
+            $streak = $this->calculateStreak($user);
 
-        // 4. Habit Tracker with eager loading for current week
-        $habits = $this->getHabitsForWeek($user, $startOfWeek, $endOfWeek);
+            // 3. Productivity Trends (Current week Mon - Sun)
+            $startOfWeek = Carbon::now()->startOfWeek(Carbon::MONDAY);
+            $endOfWeek = Carbon::now()->endOfWeek(Carbon::SUNDAY);
+            $productivityTrends = $this->getProductivityTrends($user, $startOfWeek, $endOfWeek);
 
-        // 5. Pending tasks ordered by closest deadline first (top list, excluding past deadlines)
-        $todayStr = Carbon::today()->toDateString();
-        $upcomingTasks = (clone $tasksQuery)
-            ->where('status', '!=', 'done')
-            ->where(function ($q) use ($todayStr) {
-                $q->whereNull('deadline')
-                  ->orWhere('deadline', '')
-                  ->orWhere('deadline', '>=', $todayStr);
-            })
-            ->orderByRaw('CASE WHEN deadline IS NULL OR deadline = "" THEN 1 ELSE 0 END, deadline ASC')
-            ->get();
+            // 4. Habit Tracker with eager loading for current week
+            $habits = $this->getHabitsForWeek($user, $startOfWeek, $endOfWeek);
 
-        return [
-            'stats' => [
-                'completedTasks' => $completedTasks,
-                'pendingTasks' => $pendingTasks,
-                'streak' => $streak,
-            ],
-            'productivityTrends' => $productivityTrends,
-            'habits' => $habits,
-            'upcomingTasks' => $upcomingTasks,
-        ];
+            // 5. Pending tasks ordered by closest deadline first (top list, excluding past deadlines)
+            $todayStr = Carbon::today()->toDateString();
+            $upcomingTasks = (clone $tasksQuery)
+                ->where('status', '!=', 'done')
+                ->where(function ($q) use ($todayStr) {
+                    $q->whereNull('deadline')
+                      ->orWhere('deadline', '')
+                      ->orWhere('deadline', '>=', $todayStr);
+                })
+                ->orderByRaw('CASE WHEN deadline IS NULL OR deadline = "" THEN 1 ELSE 0 END, deadline ASC')
+                ->get();
+
+            return [
+                'stats' => [
+                    'completedTasks' => $completedTasks,
+                    'pendingTasks' => $pendingTasks,
+                    'streak' => $streak,
+                ],
+                'productivityTrends' => $productivityTrends,
+                'habits' => $habits,
+                'upcomingTasks' => $upcomingTasks,
+            ];
+        });
     }
 
     /**
@@ -194,6 +200,8 @@ class DashboardService
                 'completed' => true,
             ]);
         }
+
+        Cache::forget("user_{$habit->user_id}_dashboard_data");
     }
 
     /**
@@ -201,6 +209,8 @@ class DashboardService
      */
     public function storeHabit(User $user, string $name): Habit
     {
+        Cache::forget("user_{$user->id}_dashboard_data");
+
         return Habit::create([
             'user_id' => $user->id,
             'name' => $name,
@@ -212,6 +222,8 @@ class DashboardService
      */
     public function destroyHabit(Habit $habit): void
     {
+        Cache::forget("user_{$habit->user_id}_dashboard_data");
+
         $habit->logs()->delete();
         $habit->delete();
     }

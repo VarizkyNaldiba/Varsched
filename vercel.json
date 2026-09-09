@@ -5,6 +5,38 @@
       "runtime": "vercel-php@0.7.3"
     }
   },
+  "headers": [
+    {
+      "source": "/build/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
+    }
+  ],
   "routes": [
     {
       "src": "/build/(.*)",
@@ -26,7 +58,7 @@
   "outputDirectory": "public",
   "env": {
     "APP_ENV": "production",
-    "APP_DEBUG": "true",
+    "APP_DEBUG": "false",
     "APP_KEY": "base64:tY3ISpij6qxZcZlbM8Dra3karPqvZQyY+e17ENJ1VHE=",
     "SESSION_DRIVER": "cookie",
     "LOG_CHANNEL": "stderr",

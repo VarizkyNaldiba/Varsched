@@ -32,7 +32,11 @@ class ActivityLogger
                 'user_agent' => $request ? substr((string) $request->userAgent(), 0, 255) : null,
             ]);
         } catch (\Throwable $e) {
-            \Log::warning('Failed to write activity log: ' . $e->getMessage());
+            \Log::error('Failed to write activity log: ' . $e->getMessage(), [
+                'action' => $action,
+                'user_id' => $user?->id,
+                'exception' => $e,
+            ]);
             return null;
         }
     }

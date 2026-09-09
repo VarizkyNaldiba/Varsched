@@ -1,0 +1,44 @@
+name: CI/CD Pipeline - Varsched
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    name: Build & Verify Pipeline
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP Environment
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, pdo, pdo_sqlite, bcmath
+          coverage: none
+
+      - name: Install PHP Dependencies
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install JS Dependencies
+        run: npm ci
+
+      - name: Type Check & Verify TypeScript
+        run: npx tsc --noEmit
+
+      - name: Build Production Assets
+        run: npm run build
+
+      - name: Run Application Health Checks
+        run: php artisan route:list
