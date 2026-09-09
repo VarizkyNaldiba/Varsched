@@ -36,14 +36,28 @@ class DatabaseBackup extends Command
         }
 
         $timestamp = now()->format('Y_m_d_His');
-        $filename = "backup_{$connection}_{$timestamp}.sqlite";
+        $filename = "backup_{$connection}_{$timestamp}.sql";
         $backupPath = "{$backupDir}/{$filename}";
 
-        if ($connection === 'sqlite') {
-            $dbPath = config('database.connections.sqlite.database');
-            if (File::exists($dbPath)) {
-                File::copy($dbPath, $backupPath);
-                $this->info("SQLite database backed up successfully to: {$backupPath}");
+        if ($connection === 'mysql') {
+            $host = config('database.connections.mysql.host', '127.0.0.1');
+            $database = config('database.connections.mysql.database', 'varsched');
+            $username = config('database.connections.mysql.username', 'root');
+            $password = config('database.connections.mysql.password', '');
+
+            $dumpCmd = sprintf(
+                'mysqldump --user=%s %s --host=%s %s > %s',
+                escapeshellarg($username),
+                $password ? '--password=' . escapeshellarg($password) : '',
+                escapeshellarg($host),
+                escapeshellarg($database),
+                escapeshellarg($backupPath)
+            );
+
+            @exec($dumpCmd, $output, $returnVar);
+
+            if ($returnVar === 0 && File::exists($backupPath)) {
+                $this->info("MySQL database backed up successfully to: {$backupPath}");
                 return Command::SUCCESS;
             }
         }

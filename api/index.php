@@ -43,7 +43,7 @@ $criticalEnv = [
     'QUEUE_CONNECTION' => 'sync',
     'FILESYSTEM_DISK' => 'local',
     'LOG_CHANNEL' => 'stderr',
-    'DB_CONNECTION' => 'sqlite',
+    'DB_CONNECTION' => 'mysql',
     'APP_MAINTENANCE_DRIVER' => 'file',
     'APP_ENV' => 'production',
     'APP_DEBUG' => 'true',
@@ -60,23 +60,6 @@ foreach ($criticalEnv as $key => $default) {
         $_ENV[$key] = $default;
         $_SERVER[$key] = $default;
     }
-}
-
-// Support SQLite fallback
-$dbConnection = getenv('DB_CONNECTION') ?: ($_ENV['DB_CONNECTION'] ?? 'sqlite');
-if ($dbConnection === 'sqlite') {
-    $dbFile = '/tmp/database.sqlite';
-    if (!file_exists($dbFile) || filesize($dbFile) === 0) {
-        $sourceDb = __DIR__ . '/../database/database.sqlite';
-        if (file_exists($sourceDb) && filesize($sourceDb) > 0) {
-            @copy($sourceDb, $dbFile);
-        } else {
-            @touch($dbFile);
-        }
-    }
-    putenv("DB_DATABASE={$dbFile}");
-    $_ENV['DB_DATABASE'] = $dbFile;
-    $_SERVER['DB_DATABASE'] = $dbFile;
 }
 
 // Forward to Laravel's public entrypoint with exception handling
