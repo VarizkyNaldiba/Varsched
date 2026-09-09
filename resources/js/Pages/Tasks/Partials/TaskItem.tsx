@@ -1,15 +1,17 @@
 import { Task } from '../types';
-import { CheckCircle2, Circle, Clock, ChevronDown, Trash2 } from 'lucide-react';
+import { CheckCircle2, Circle, Clock, ChevronDown, Trash2, Edit2 } from 'lucide-react';
 
 interface TaskItemProps {
     task: Task;
     onUpdateStatus: (task: Task, status: string) => void;
+    onEdit: (task: Task) => void;
     onDelete: (taskId: number) => void;
 }
 
 export default function TaskItem({
     task,
     onUpdateStatus,
+    onEdit,
     onDelete,
 }: TaskItemProps) {
     const isDone = task.status === 'done';
@@ -110,6 +112,15 @@ export default function TaskItem({
                         className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none opacity-50"
                     />
                 </div>
+
+                <button
+                    type="button"
+                    onClick={() => onEdit(task)}
+                    className="p-1.5 text-gray-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/30 rounded-lg transition cursor-pointer"
+                    title="Edit Task"
+                >
+                    <Edit2 size={16} />
+                </button>
 
                 <button
                     type="button"

@@ -11,6 +11,7 @@ interface CategoryCardProps {
     onToggleCollapse: (category: string) => void;
     onOpenCreateModal: (category: string) => void;
     onUpdateStatus: (task: Task, status: string) => void;
+    onEditTask: (task: Task) => void;
     onDeleteTask: (taskId: number) => void;
 }
 
@@ -22,6 +23,7 @@ export default function CategoryCard({
     onToggleCollapse,
     onOpenCreateModal,
     onUpdateStatus,
+    onEditTask,
     onDeleteTask,
 }: CategoryCardProps) {
     const completedCount = tasks.filter((t) => t.status === 'done').length;
@@ -111,6 +113,7 @@ export default function CategoryCard({
                                 key={task.id}
                                 task={task}
                                 onUpdateStatus={onUpdateStatus}
+                                onEdit={onEditTask}
                                 onDelete={onDeleteTask}
                             />
                         ))}

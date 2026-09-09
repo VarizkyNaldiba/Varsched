@@ -44,10 +44,10 @@ class TaskController extends Controller
     {
         $data = $request->validated();
 
-        if (empty($data['deadline'])) {
+        if (array_key_exists('deadline', $data) && empty($data['deadline'])) {
             $data['deadline'] = null;
         }
-        if (empty($data['start_time'])) {
+        if (array_key_exists('start_time', $data) && empty($data['start_time'])) {
             $data['start_time'] = null;
         }
 

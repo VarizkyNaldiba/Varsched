@@ -5,6 +5,7 @@ import { PageProps } from '@/types';
 import TasksSummaryBar from './Partials/TasksSummaryBar';
 import CategoryCard from './Partials/CategoryCard';
 import CreateTaskModal from './Partials/CreateTaskModal';
+import EditTaskModal from './Partials/EditTaskModal';
 import { CATEGORY_THEMES } from './Partials/themes';
 import { Plus, ListTodo, FolderArchive, Cloud, Database } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -20,6 +21,7 @@ export default function TasksIndex({ tasks }: Props) {
     const [activeTasks, setActiveTasks] = useState<Task[]>(tasks);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalCategory, setModalCategory] = useState<string | null>(null);
+    const [editingTask, setEditingTask] = useState<Task | null>(null);
     const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
     const isFirebaseActive = isFirebaseConfigured();
 
@@ -144,6 +146,7 @@ export default function TasksIndex({ tasks }: Props) {
                                     onToggleCollapse={toggleCollapse}
                                     onOpenCreateModal={openCreateModal}
                                     onUpdateStatus={updateStatus}
+                                    onEditTask={(task) => setEditingTask(task)}
                                     onDeleteTask={deleteTask}
                                 />
                             ))}
@@ -157,6 +160,12 @@ export default function TasksIndex({ tasks }: Props) {
                 availableCategories={categories}
                 authUserId={auth?.user?.id}
                 onClose={() => { setIsModalOpen(false); setModalCategory(null); }}
+            />
+            <EditTaskModal
+                isOpen={Boolean(editingTask)}
+                task={editingTask}
+                availableCategories={categories}
+                onClose={() => setEditingTask(null)}
             />
         </AuthenticatedLayout>
     );

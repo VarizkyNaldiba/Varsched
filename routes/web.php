@@ -7,9 +7,11 @@ use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PomodoroController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -30,6 +32,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Calendar
     Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar');
+
+    // Pomodoro Timer
+    Route::get('/pomodoro', [PomodoroController::class, 'index'])->name('pomodoro');
 
     // Notifications
     Route::post('/notifications/send-reminder', [NotificationController::class, 'sendReminder'])->name('notifications.send-reminder');
@@ -61,3 +66,9 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+// Fallback Route for 404 Page Not Found
+Route::fallback(function () {
+    return Inertia::render('Error', ['status' => 404]);
+});
+

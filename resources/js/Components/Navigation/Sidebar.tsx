@@ -87,6 +87,12 @@ export default function Sidebar() {
             active: route().current('calendar'),
             icon: Calendar,
         },
+        {
+            name: 'Pomodoro Timer',
+            href: route('pomodoro'),
+            active: route().current('pomodoro'),
+            icon: Timer,
+        },
     ];
 
     const isAdmin = user.role === 'admin';
