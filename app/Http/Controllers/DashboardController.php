@@ -30,28 +30,28 @@ class DashboardController extends Controller
 
         $this->dashboardService->storeHabit($request->user(), $validated['name']);
 
-        return back();
+        return back()->with('success', 'Habit baru berhasil ditambahkan!');
     }
 
-    public function toggleHabit(Request $request, Habit $habit): RedirectResponse
+    public function toggleHabit(Request $request, $id): RedirectResponse
     {
-        if ($habit->user_id !== $request->user()->id) {
-            abort(403);
+        $habit = Habit::where('user_id', $request->user()->id)->where('id', $id)->first();
+
+        if ($habit) {
+            $this->dashboardService->toggleHabit($habit, $request->input('date'));
         }
 
-        $this->dashboardService->toggleHabit($habit, $request->input('date'));
-
-        return back();
+        return back()->with('success', 'Status habit berhasil diperbarui!');
     }
 
-    public function destroyHabit(Request $request, Habit $habit): RedirectResponse
+    public function destroyHabit(Request $request, $id): RedirectResponse
     {
-        if ($habit->user_id !== $request->user()->id) {
-            abort(403);
+        $habit = Habit::where('user_id', $request->user()->id)->where('id', $id)->first();
+
+        if ($habit) {
+            $this->dashboardService->destroyHabit($habit);
         }
 
-        $this->dashboardService->destroyHabit($habit);
-
-        return back();
+        return back()->with('success', 'Habit berhasil dihapus!');
     }
 }

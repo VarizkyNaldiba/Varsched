@@ -21,15 +21,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->respond(function (\Symfony\Component\HttpFoundation\Response $response, \Throwable $exception, \Illuminate\Http\Request $request) {
-            if (in_array($response->getStatusCode(), [404, 500, 503, 403])) {
-                return \Inertia\Inertia::render('Error', ['status' => $response->getStatusCode()])
-                    ->toResponse($request)
-                    ->setStatusCode($response->getStatusCode());
-            }
-
-            return $response;
-        });
+        //
     })->create();
 
 if ($storagePath = ($_ENV['LARAVEL_STORAGE_PATH'] ?? $_SERVER['LARAVEL_STORAGE_PATH'] ?? null)) {

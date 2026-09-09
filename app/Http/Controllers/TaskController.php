@@ -37,38 +37,42 @@ class TaskController extends Controller
             Log::warning('Task email notification failed: ' . $e->getMessage());
         }
 
-        return back();
+        return back()->with('success', 'Tugas baru berhasil dibuat!');
     }
 
-    public function update(UpdateTaskRequest $request, Task $task): RedirectResponse
+    public function update(UpdateTaskRequest $request, $id): RedirectResponse
     {
-        $data = $request->validated();
+        $task = Task::where('user_id', $request->user()->id)->where('id', $id)->first();
 
-        if (array_key_exists('deadline', $data) && empty($data['deadline'])) {
-            $data['deadline'] = null;
+        if ($task) {
+            $data = $request->validated();
+
+            if (array_key_exists('deadline', $data) && empty($data['deadline'])) {
+                $data['deadline'] = null;
+            }
+            if (array_key_exists('start_time', $data) && empty($data['start_time'])) {
+                $data['start_time'] = null;
+            }
+
+            $task->update($data);
+
+            ActivityLogger::log('TASK_UPDATE', "Tugas '{$task->title}' diperbarui (status: {$task->status}).", $request->user(), $request);
         }
-        if (array_key_exists('start_time', $data) && empty($data['start_time'])) {
-            $data['start_time'] = null;
-        }
 
-        $task->update($data);
-
-        ActivityLogger::log('TASK_UPDATE', "Tugas '{$task->title}' diperbarui (status: {$task->status}).", $request->user(), $request);
-
-        return back();
+        return back()->with('success', 'Tugas berhasil diperbarui!');
     }
 
-    public function destroy(Request $request, Task $task): RedirectResponse
+    public function destroy(Request $request, $id): RedirectResponse
     {
-        if ($task->user_id !== $request->user()->id) {
-            abort(403);
+        $task = Task::where('user_id', $request->user()->id)->where('id', $id)->first();
+
+        if ($task) {
+            $title = $task->title;
+            $task->delete();
+
+            ActivityLogger::log('TASK_DELETE', "Tugas '{$title}' dihapus.", $request->user(), $request);
         }
 
-        $title = $task->title;
-        $task->delete();
-
-        ActivityLogger::log('TASK_DELETE', "Tugas '{$title}' dihapus.", $request->user(), $request);
-
-        return back();
+        return back()->with('success', 'Tugas berhasil dihapus!');
     }
 }

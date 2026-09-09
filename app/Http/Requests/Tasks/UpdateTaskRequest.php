@@ -8,7 +8,7 @@ class UpdateTaskRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->task && $this->task->user_id === $this->user()->id;
+        return true;
     }
 
     public function rules(): array
