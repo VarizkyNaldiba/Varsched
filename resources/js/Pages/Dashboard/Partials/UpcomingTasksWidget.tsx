@@ -155,7 +155,7 @@ export default function UpcomingTasksWidget({ tasks, onUpdateStatus }: UpcomingT
                     </Link>
                 </div>
             ) : (
-                <div className="space-y-3 max-h-[380px] overflow-y-auto custom-scrollbar pr-1">
+                <div className="space-y-3 max-h-[650px] overflow-y-auto custom-scrollbar pr-1">
                     {sortedTasks.map((task) => {
                         const isDone = task.status === 'done';
                         return (
