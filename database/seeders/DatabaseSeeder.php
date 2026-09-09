@@ -20,22 +20,21 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Create Default Admin Account requested by user: admin@2varsched (pass: 12345ada)
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@2varsched'],
+        // 1. Create Default Admin Accounts
+        $adminMain = User::firstOrCreate(
+            ['email' => 'admin@varsched.com'],
             [
                 'name' => 'Admin Varsched',
-                'password' => Hash::make('12345ada'),
+                'password' => Hash::make('adminpassword123'),
                 'role' => 'admin',
                 'email_verified_at' => now(),
             ]
         );
-        $admin->update([
+        $adminMain->update([
             'role' => 'admin',
-            'password' => Hash::make('12345ada'),
+            'password' => Hash::make('adminpassword123'),
         ]);
 
-        // Convenient alias for RFC-compliant environments: admin@2varsched.com
         $adminAlias = User::firstOrCreate(
             ['email' => 'admin@2varsched.com'],
             [

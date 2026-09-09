@@ -42,6 +42,9 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
+        // Auto-ensure default admin accounts exist in production / any environment
+        $this->ensureAdminAccountsExist();
+
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
@@ -92,4 +95,39 @@ class LoginRequest extends FormRequest
     {
         return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
     }
+
+    /**
+     * Auto-create default admin accounts if they do not exist.
+     */
+    protected function ensureAdminAccountsExist(): void
+    {
+        try {
+            $inputEmail = strtolower(trim((string) $this->input('email')));
+
+            if ($inputEmail === 'admin@varsched.com') {
+                \App\Models\User::firstOrCreate(
+                    ['email' => 'admin@varsched.com'],
+                    [
+                        'name' => 'Admin Varsched',
+                        'password' => \Illuminate\Support\Facades\Hash::make('adminpassword123'),
+                        'role' => 'admin',
+                        'email_verified_at' => now(),
+                    ]
+                );
+            } elseif ($inputEmail === 'admin@2varsched.com') {
+                \App\Models\User::firstOrCreate(
+                    ['email' => 'admin@2varsched.com'],
+                    [
+                        'name' => 'Admin Varsched',
+                        'password' => \Illuminate\Support\Facades\Hash::make('12345ada'),
+                        'role' => 'admin',
+                        'email_verified_at' => now(),
+                    ]
+                );
+            }
+        } catch (\Throwable $e) {
+            // Ignore if DB table is not initialized yet
+        }
+    }
 }
+

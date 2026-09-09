@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { usePage } from '@inertiajs/react';
 import { PageProps } from '@/types';
-import { ListTodo, Layers, Target, Play, HelpCircle } from 'lucide-react';
+import { ListTodo, X } from 'lucide-react';
 import { isFirebaseConfigured } from '@/Services/firebase';
 import { subscribeUserTasks } from '@/Services/firestoreService';
 
@@ -9,6 +9,7 @@ export default function TaskSummaryWidget() {
     const pageProps = usePage<PageProps & { taskSummary?: { all: number; pending: number; in_progress: number; done: number } }>().props;
     const { auth, taskSummary } = pageProps;
 
+    const [isOpen, setIsOpen] = useState(false);
     const [summary, setSummary] = useState({
         all: taskSummary?.all ?? 0,
         pending: taskSummary?.pending ?? 0,
@@ -16,8 +17,8 @@ export default function TaskSummaryWidget() {
         done: taskSummary?.done ?? 0,
     });
 
-    const [activeTab, setActiveTab] = useState<'summary' | 'categories' | 'target' | 'activity'>('summary');
     const isFirebaseActive = isFirebaseConfigured();
+    const widgetRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (taskSummary) {
@@ -52,84 +53,77 @@ export default function TaskSummaryWidget() {
         };
     }, [auth?.user?.id, isFirebaseActive]);
 
+    // Handle outside click & escape key to close pop-up
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (widgetRef.current && !widgetRef.current.contains(e.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setIsOpen(false);
+        };
+
+        if (isOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+            document.addEventListener('keydown', handleKeyDown);
+        }
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isOpen]);
+
     return (
-        <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl border border-gray-200/80 dark:border-gray-700/80 rounded-3xl p-4 sm:p-5 shadow-xl shadow-gray-200/40 dark:shadow-none flex items-center gap-4 sm:gap-5 transition-all duration-300 hover:shadow-2xl">
-            {/* Left Vertical Icon Bar / Tab Strip */}
-            <div className="flex flex-col items-center gap-2 pr-3 sm:pr-4 border-r border-gray-100 dark:border-gray-700/80">
-                <div className="relative group">
-                    <button
-                        type="button"
-                        onClick={() => setActiveTab('summary')}
-                        className={`p-2.5 rounded-2xl transition-all duration-200 cursor-pointer ${
-                            activeTab === 'summary'
-                                ? 'bg-indigo-100 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/50 shadow-sm'
-                                : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50'
-                        }`}
-                        title="Ringkasan Task"
-                    >
-                        <ListTodo size={20} strokeWidth={2.2} />
-                    </button>
-                    {/* Tooltip badge like in image */}
-                    <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2.5 py-1 bg-gray-900 text-white text-[11px] font-bold rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30 shadow-lg">
-                        Ringkasan Task
-                    </div>
-                </div>
+        <div ref={widgetRef} className="relative inline-block">
+            {/* Single Floating Trigger Icon Button */}
+            <button
+                type="button"
+                onClick={() => setIsOpen(!isOpen)}
+                className={`p-3 rounded-2xl transition-all duration-200 cursor-pointer flex items-center justify-center relative shadow-md hover:shadow-lg ${
+                    isOpen
+                        ? 'bg-indigo-600 text-white shadow-indigo-600/30 ring-4 ring-indigo-500/20'
+                        : 'bg-white/90 dark:bg-gray-800/90 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-gray-200/80 dark:border-gray-700/80 backdrop-blur-xl'
+                }`}
+                title="Ringkasan Task"
+            >
+                <ListTodo size={22} strokeWidth={2.5} />
+                
+                {/* Badge Number Indicator */}
+                {summary.all > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 px-2 py-0.5 text-[10px] font-extrabold bg-amber-500 text-white rounded-full shadow-sm border-2 border-white dark:border-gray-800 animate-pulse">
+                        {summary.all}
+                    </span>
+                )}
+            </button>
 
-                <button
-                    type="button"
-                    onClick={() => setActiveTab('categories')}
-                    className={`p-2.5 rounded-2xl transition-all duration-200 cursor-pointer ${
-                        activeTab === 'categories'
-                            ? 'bg-indigo-100 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/50 shadow-sm'
-                            : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50'
-                    }`}
-                    title="Kategori Task"
-                >
-                    <Layers size={20} strokeWidth={2.2} />
-                </button>
-
-                <button
-                    type="button"
-                    onClick={() => setActiveTab('target')}
-                    className={`p-2.5 rounded-2xl transition-all duration-200 cursor-pointer ${
-                        activeTab === 'target'
-                            ? 'bg-indigo-100 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/50 shadow-sm'
-                            : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50'
-                    }`}
-                    title="Target Task"
-                >
-                    <Target size={20} strokeWidth={2.2} />
-                </button>
-
-                <button
-                    type="button"
-                    onClick={() => setActiveTab('activity')}
-                    className={`p-2.5 rounded-2xl transition-all duration-200 cursor-pointer ${
-                        activeTab === 'activity'
-                            ? 'bg-indigo-100 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/50 shadow-sm'
-                            : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50'
-                    }`}
-                    title="Aktivitas"
-                >
-                    <Play size={20} strokeWidth={2.2} />
-                </button>
-            </div>
-
-            {/* Right Stat Grid Content */}
-            <div className="flex-1 min-w-[210px]">
-                <div className="flex items-center justify-between mb-3">
+            {/* Clean Popup Card Layout Modal with Smooth Swipe Left Animation */}
+            <div
+                className={`absolute right-0 top-full mt-3 w-[92vw] sm:w-[350px] bg-white/95 dark:bg-gray-800/95 backdrop-blur-2xl rounded-3xl border border-gray-200/90 dark:border-gray-700/90 p-4 sm:p-5 shadow-2xl z-50 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] transform origin-top-right ${
+                    isOpen
+                        ? 'opacity-100 translate-x-0 scale-100 pointer-events-auto'
+                        : 'opacity-0 translate-x-12 scale-95 pointer-events-none'
+                }`}
+            >
+                {/* Header */}
+                <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-100 dark:border-gray-700/80">
                     <h4 className="text-[11px] font-black tracking-widest text-slate-500 dark:text-gray-400 uppercase">
                         RINGKASAN TASK
                     </h4>
-                    <div className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-help" title="Statistik Ringkasan Task Real-Time">
-                        <HelpCircle size={16} />
-                    </div>
+                    <button
+                        type="button"
+                        onClick={() => setIsOpen(false)}
+                        className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition cursor-pointer"
+                    >
+                        <X size={16} />
+                    </button>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                {/* Stat Grid (Total Task, Diproses, Selesai) */}
+                <div className="grid grid-cols-3 gap-2.5">
                     {/* All Task (Total) */}
-                    <div className="bg-gray-50/80 dark:bg-gray-900/40 p-2.5 sm:p-3 rounded-2xl border border-gray-100 dark:border-gray-800">
-                        <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 block mb-0.5">
+                    <div className="bg-gray-50/90 dark:bg-gray-900/50 p-3 rounded-2xl border border-gray-100 dark:border-gray-700/60 text-center">
+                        <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 block mb-0.5">
                             Total Task
                         </span>
                         <span className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-gray-100 leading-tight">
@@ -137,19 +131,9 @@ export default function TaskSummaryWidget() {
                         </span>
                     </div>
 
-                    {/* Pending Task */}
-                    <div className="bg-amber-50/50 dark:bg-amber-950/20 p-2.5 sm:p-3 rounded-2xl border border-amber-100/60 dark:border-amber-900/30">
-                        <span className="text-xs font-bold text-amber-600 dark:text-amber-400 block mb-0.5">
-                            Menunggu
-                        </span>
-                        <span className="text-2xl sm:text-3xl font-black text-amber-500 dark:text-amber-400 leading-tight">
-                            {summary.pending}
-                        </span>
-                    </div>
-
                     {/* In Progress */}
-                    <div className="bg-blue-50/50 dark:bg-blue-950/20 p-2.5 sm:p-3 rounded-2xl border border-blue-100/60 dark:border-blue-900/30">
-                        <span className="text-xs font-bold text-blue-600 dark:text-blue-400 block mb-0.5">
+                    <div className="bg-blue-50/60 dark:bg-blue-950/30 p-3 rounded-2xl border border-blue-100 dark:border-blue-900/40 text-center">
+                        <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400 block mb-0.5">
                             Diproses
                         </span>
                         <span className="text-2xl sm:text-3xl font-black text-blue-500 dark:text-blue-400 leading-tight">
@@ -158,8 +142,8 @@ export default function TaskSummaryWidget() {
                     </div>
 
                     {/* Done Task */}
-                    <div className="bg-emerald-50/50 dark:bg-emerald-950/20 p-2.5 sm:p-3 rounded-2xl border border-emerald-100/60 dark:border-emerald-900/30">
-                        <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 block mb-0.5">
+                    <div className="bg-emerald-50/60 dark:bg-emerald-950/30 p-3 rounded-2xl border border-emerald-100 dark:border-emerald-900/40 text-center">
+                        <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 block mb-0.5">
                             Selesai
                         </span>
                         <span className="text-2xl sm:text-3xl font-black text-emerald-500 dark:text-emerald-400 leading-tight">
@@ -171,3 +155,4 @@ export default function TaskSummaryWidget() {
         </div>
     );
 }
+

@@ -4,13 +4,20 @@ import { PropsWithChildren, ReactNode, useState, useEffect } from 'react';
 import { usePage } from '@inertiajs/react';
 import { PageProps } from '@/types';
 import { CheckCircle2, AlertCircle, X } from 'lucide-react';
+import { syncUserToFirestore } from '@/Services/firestoreService';
 
 export default function Authenticated({
     header,
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
-    const { flash } = usePage<PageProps>().props;
+    const { auth, flash } = usePage<PageProps>().props;
     const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+    useEffect(() => {
+        if (auth?.user) {
+            syncUserToFirestore(auth.user);
+        }
+    }, [auth?.user?.id]);
 
     useEffect(() => {
         if (flash?.success) {
