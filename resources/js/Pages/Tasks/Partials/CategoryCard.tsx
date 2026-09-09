@@ -54,7 +54,9 @@ export default function CategoryCard({
                                 <span className="truncate">{category}</span>
                             </h3>
                             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                {completedCount} of {totalCount} tasks completed ({progressPct}%)
+                                <span className={completedCount > 0 ? "font-bold text-emerald-600 dark:text-emerald-400" : "font-medium"}>
+                                    {completedCount} of {totalCount} tasks completed ({progressPct}%)
+                                </span>
                             </p>
                         </div>
                     </div>
@@ -86,9 +88,13 @@ export default function CategoryCard({
                     </div>
                 </div>
 
-                <div className="w-full bg-gray-200 dark:bg-gray-700 h-2 rounded-full mt-4 overflow-hidden">
+                <div className="w-full bg-gray-200/90 dark:bg-gray-700/90 h-2.5 rounded-full mt-4 overflow-hidden shadow-inner p-0.5 border border-gray-200/40 dark:border-gray-700/40">
                     <div
-                        className={`h-full transition-all duration-500 rounded-full ${theme.progress}`}
+                        className={`h-full transition-all duration-500 rounded-full ${
+                            completedCount > 0
+                                ? 'bg-gradient-to-r from-emerald-500 to-teal-400 dark:from-emerald-400 dark:to-teal-300 shadow-sm shadow-emerald-500/40'
+                                : 'bg-gray-300 dark:bg-gray-600'
+                        }`}
                         style={{ width: `${progressPct}%` }}
                     />
                 </div>
